@@ -1,0 +1,69 @@
+pipeline {
+	agent any
+
+	options {
+		timestamps()
+	}
+
+	stages {
+		stage('Install system dependencies') {
+			steps {
+				dir('PyTest DQ Framework') {
+					sh 'apt-get update && apt-get install -y python3 python3-pip python3-venv libpq-dev'
+				}
+			}
+		}
+
+		stage('Install Python dependencies') {
+			steps {
+				dir('PyTest DQ Framework') {
+					sh '''
+						python3 -m venv .venv
+						.venv/bin/python -m pip install --upgrade pip
+						.venv/bin/python -m pip install -r requirements.txt
+					'''
+				}
+			}
+		}
+
+		stage('Run Parquet DQ tests') {
+			steps {
+				dir('PyTest DQ Framework') {
+					withCredentials([usernamePassword(
+						credentialsId: 'POSTGRES_SECRET',
+						usernameVariable: 'POSTGRES_USER',
+						passwordVariable: 'POSTGRES_PASSWORD'
+					)]) {
+						catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+							sh '''
+								mkdir -p html_report
+								.venv/bin/python -m pytest tests -m "parquet_data" \
+									--db_host="postgres" \
+									--db_port="5432" \
+									--db_name="mydatabase" \
+									--html=html_report/report.html \
+									--self-contained-html
+							'''
+						}
+					}
+				}
+			}
+		}
+
+		stage('Archive and publish DQ report') {
+			steps {
+				dir('PyTest DQ Framework') {
+					archiveArtifacts artifacts: 'html_report/**', allowEmptyArchive: false
+					publishHTML(target: [
+						allowMissing: false,
+						keepAll: true,
+						alwaysLinkToLastBuild: true,
+						reportDir: 'html_report',
+						reportFiles: 'report.html',
+						reportName: 'Parquet DQ Test Report'
+					])
+				}
+			}
+		}
+	}
+}
