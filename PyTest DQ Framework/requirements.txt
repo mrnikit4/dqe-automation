@@ -1,0 +1,6 @@
+
+pytest>=8.3,<10
+pytest-html>=4.1,<5
+pandas>=2.2,<4
+psycopg2-binary>=2.9,<3
+pyarrow>=19,<25
