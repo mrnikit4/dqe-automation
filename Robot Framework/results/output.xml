@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.5.1 (Python 3.14.2 on win32)" generated="2026-11-08T13:13:54.486348" rpa="false" schemaversion="5">
+<suite id="s1" name="Test" source="C:\Users\NikitaNikulin1\Projects\DQE_automation\dqe-automation-main\Robot Framework\test.robot">
+<test id="s1-t1" name="HTML report matches Parquet data" line="11">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-08T13:13:55.726886" level="INFO">${report_url} = file:///C:/Users/NikitaNikulin1/Projects/DQE_automation/dqe-automation-main/Robot%20Framework/report.html</msg>
+<var>${report_url}</var>
+<arg>pathlib.Path(r'''${REPORT_FILE}''').resolve().as_uri()</arg>
+<arg>modules=pathlib</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-08T13:13:55.721550" elapsed="0.005480"/>
+</kw>
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-11-08T13:13:55.728568" level="INFO">Opening browser 'chrome' to base url 'file:///C:/Users/NikitaNikulin1/Projects/DQE_automation/dqe-automation-main/Robot%20Framework/report.html'.</msg>
+<arg>${report_url}</arg>
+<arg>chrome</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-11-08T13:13:55.727911" elapsed="2.974731"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>css:.table</arg>
+<arg>15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-11-08T13:13:58.703090" elapsed="0.033032"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-11-08T13:13:58.746830" level="INFO">${table} = &lt;selenium.webdriver.remote.webelement.WebElement (session="49f13731129a074ca5e3aafe245ac0f6", element="f.DA62A38BE7850131E96848D7F39AD806.d.FA4CFCEC11F74EC29C28ACE49284A5D9.e.2")&gt;</msg>
+<var>${table}</var>
+<arg>css:.table</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-11-08T13:13:58.736491" elapsed="0.010457"/>
+</kw>
+<kw name="Read Html Table" owner="helper">
+<msg time="2026-11-08T13:13:59.594747" level="INFO">${html_dataframe} =   Facility Type  Visit Date  Average Time Spent
+0      Hospital  2026-10-06               42.00
+1        Clinic  2026-10-06               39.67</msg>
+<var>${html_dataframe}</var>
+<arg>${table}</arg>
+<arg>${FILTER_DATE}</arg>
+<doc>Read a located HTML table into a DataFrame.</doc>
+<status status="PASS" start="2026-11-08T13:13:58.747301" elapsed="0.847640"/>
+</kw>
+<kw name="Read Parquet Dataset" owner="helper">
+<msg time="2026-11-08T13:13:59.929351" level="INFO">${parquet_dataframe} =   Facility Type  Visit Date  Average Time Spent
+0      Hospital  2026-10-06               42.00
+1        Clinic  2026-10-06               39.67</msg>
+<var>${parquet_dataframe}</var>
+<arg>${PARQUET_FOLDER}</arg>
+<arg>${FILTER_DATE}</arg>
+<doc>Read a Parquet folder and optionally filter it by visit date.</doc>
+<status status="PASS" start="2026-11-08T13:13:59.595337" elapsed="0.334143"/>
+</kw>
+<kw name="Compare Dataframes" owner="helper">
+<msg time="2026-11-08T13:13:59.935066" level="INFO">${matches} = True</msg>
+<msg time="2026-11-08T13:13:59.935175" level="INFO">${differences} = </msg>
+<var>${matches}</var>
+<var>${differences}</var>
+<arg>${html_dataframe}</arg>
+<arg>${parquet_dataframe}</arg>
+<doc>Compare two DataFrames and return a match result and differences.</doc>
+<status status="PASS" start="2026-11-08T13:13:59.929854" elapsed="0.005365"/>
+</kw>
+<if>
+<branch type="IF" condition="not $matches">
+<kw name="Fail" owner="BuiltIn">
+<arg>DataFrames differ for ${FILTER_DATE}: ${differences}</arg>
+<doc>Fails the test or task with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2026-11-08T13:13:59.935972" elapsed="0.000059"/>
+</kw>
+<status status="NOT RUN" start="2026-11-08T13:13:59.935461" elapsed="0.000648"/>
+</branch>
+<status status="PASS" start="2026-11-08T13:13:59.935399" elapsed="0.000792"/>
+</if>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-11-08T13:13:59.936641" elapsed="2.225495"/>
+</kw>
+<status status="PASS" start="2026-11-08T13:13:55.719138" elapsed="6.443252"/>
+</test>
+<status status="PASS" start="2026-11-08T13:13:54.488486" elapsed="7.675052"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Test" id="s1" pass="1" fail="0" skip="0">Test</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
